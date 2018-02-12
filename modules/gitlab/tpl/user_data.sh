@@ -9,9 +9,11 @@ apt-get update >> /var/log/bootstrap.log 2>&1
 apt-get -y install openssh-server nfs-common gitlab-ce >> /var/log/bootstrap.log 2>&1
 
 mkdir /gitlab-data
+mkdir -p /gitlab-data/home/.ssh /gitlab-data/uploads /gitlab-data/shared /gitlab-data/builds /gitlab-data/git-data
 mount -t nfs4 ${NAS_MOUNT_POINT}:/ /gitlab-data >> /var/log/bootstrap.log 2>&1
 echo "${NAS_MOUNT_POINT}:/ /gitlab-data nfs4 defaults,soft,rsize=1048576,wsize=1048576,noatime,nobootwait,lookupcache=positive 0 2" >> /etc/fstab
 
+touch /gitlab-data/home/.ssh/authorized_keys
 chmod -R git:git /gitlab-data/home/.ssh/
 
 cat << EOF > /etc/gitlab/gitlab.rb
