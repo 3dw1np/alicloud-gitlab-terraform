@@ -44,6 +44,7 @@ provider "alicloud" {}
 ```
 terraform init
 ```
+
 ## Managed services (manual setup)
 ### ApsaraDB for Redis
 
@@ -55,3 +56,17 @@ Then you can get the Connection Address (host) on the instance information page 
 
 * Create a file system
 * Add one mount point to each public Vswitch (ex: 7aa7048405-enk90.ap-southeast-1.nas.aliyuncs.com and 7aa7048405-txk20.ap-southeast-1.nas.aliyuncs.com)
+
+## Deployment steps
+### Base vpc
+```bash
+terraform init solutions/base_vpc
+terraform plan|apply \
+  -var-file=parameters/base_vpc.tfvars \
+  -state=states/base_vpc.tfstate \
+  solutions/base_vpc
+```
+
+### Managed services (manual setup)
+
+### Gitlab applicance
