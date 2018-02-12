@@ -33,38 +33,6 @@ resource "alicloud_snat_entry" "default" {
   count             = "${var.az_count}"
 }
 
-resource "alicloud_security_group" "web" {
-  name   = "web-sg"
-  vpc_id = "${alicloud_vpc.default.id}"
-}
-
-resource "alicloud_security_group" "ssh" {
-  name   = "ssh-sg"
-  vpc_id = "${alicloud_vpc.default.id}"
-}
-
-resource "alicloud_security_group_rule" "allow_http_access" {
-  type              = "ingress"
-  ip_protocol       = "tcp"
-  nic_type          = "intranet"
-  policy            = "accept"
-  port_range        = "80/80"
-  priority          = 1
-  security_group_id = "${alicloud_security_group.web.id}"
-  cidr_ip           = "0.0.0.0/0"
-}
-
-resource "alicloud_security_group_rule" "allow_ssh_access" {
-  type              = "ingress"
-  ip_protocol       = "tcp"
-  nic_type          = "intranet"
-  policy            = "accept"
-  port_range        = "22/22"
-  priority          = 1
-  security_group_id = "${alicloud_security_group.ssh.id}"
-  cidr_ip           = "0.0.0.0/0"
-}
-
 resource "alicloud_vswitch" "public" {
   name              = "${var.name}_public_${count.index}"
   vpc_id            = "${alicloud_vpc.default.id}"

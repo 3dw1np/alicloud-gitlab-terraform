@@ -45,18 +45,6 @@ provider "alicloud" {}
 terraform init
 ```
 
-## Managed services (manual setup)
-### ApsaraDB for Redis
-
-Add a whitelist group ips with 192.168.1.0/24,192.168.2.0/24
-
-Then you can get the Connection Address (host) on the instance information page (ex: r-gs5e52f3dd2aa6f4.redis.singapore.rds.aliyuncs.com)
-
-### NAS
-
-* Create a file system
-* Add one mount point to each public Vswitch (ex: 7aa7048405-enk90.ap-southeast-1.nas.aliyuncs.com and 7aa7048405-txk20.ap-southeast-1.nas.aliyuncs.com)
-
 ## Deployment steps
 ### Base vpc
 ```bash
@@ -68,5 +56,28 @@ terraform plan|apply \
 ```
 
 ### Managed services (manual setup)
+The managed services must be in the same region / VPC.
 
-### Gitlab applicance
+#### ApsaraDB for Redis
+
+* Create a new instance (Standard or Cluster mode) named **'gitlab_ha_redis'**
+* Select a private Vswitch where to bootstrap the instance
+* Keep in mind the password set
+* Replace the default whitelist group ips with **192.168.0.0/24,192.168.1.0/24** (corresponding to the public Vswitchs CIDR)
+* Then you can get the Connection Address (host) on the instance information page (ex:  r-gs5fa531c02cbc74.redis.singapore.rds.aliyuncs.com)
+
+#### NAS
+
+* Create a new file system
+* Rename the NAS into **'gitlab_ha_nas'** 
+* Add one mount point to each public Vswitch (ex: 7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com and 7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com)
+* Use the default permission group (allow all)
+
+### Gitlab HA application
+```bash
+terraform init solutions/gitlab_ha
+terraform plan|apply \
+  -var-file=parameters/gitlab_ha.tfvars \
+  -state=states/gitlab_ha.tfstate \
+  solutions/gitlab_ha
+```

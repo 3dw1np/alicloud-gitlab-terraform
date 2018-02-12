@@ -12,6 +12,8 @@ mkdir /gitlab-data
 mount -t nfs4 ${NAS_MOUNT_POINT}:/ /gitlab-data >> /var/log/bootstrap.log 2>&1
 echo "${NAS_MOUNT_POINT}:/ /gitlab-data nfs4 defaults,soft,rsize=1048576,wsize=1048576,noatime,nobootwait,lookupcache=positive 0 2" >> /etc/fstab
 
+chmod -R git:git /gitlab-data/home/.ssh/
+
 cat << EOF > /etc/gitlab/gitlab.rb
 external_url 'http://127.0.0.1'
 
