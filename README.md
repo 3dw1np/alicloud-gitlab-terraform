@@ -61,7 +61,7 @@ The managed services must be in the same region / VPC.
 
 #### ApsaraDB for Redis
 
-* Create a new instance (Standard or Cluster mode) named **'gitlab_ha_redis'**
+* Create a new instance (Standard or Cluster mode) named **'gitlab&#95;ha&#95;redis'**
 * Select a private Vswitch where to bootstrap the instance
 * Keep in mind the password set
 * Replace the default whitelist group ips with **192.168.0.0/24,192.168.1.0/24** (corresponding to the public Vswitchs CIDR)
@@ -70,7 +70,7 @@ The managed services must be in the same region / VPC.
 #### NAS
 
 * Create a new file system
-* Rename the NAS into **'gitlab_ha_nas'** 
+* Rename the NAS into **'gitlab&#95;ha&#95;nas'** 
 * Add one mount point to each public Vswitch (ex: 7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com and 7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com)
 * Use the default permission group (allow all)
 
@@ -82,3 +82,6 @@ terraform plan|apply \
   -state=states/gitlab_ha.tfstate \
   solutions/gitlab_ha
 ```
+
+## Issues
+If you have any issues related to gitlab-ctl reconfigure (step: gitlab::database_migrations), please create the db manually by following the [help doc of RDS](https://www.alibabacloud.com/help/doc-detail/26156.htm).

@@ -80,7 +80,7 @@ resource "alicloud_instance" "web" {
   image_id                   = "ubuntu_16_0402_64_20G_alibase_20171227.vhd"
   count                      = 2
 
-  vswitch_id                 = "${element(var.public_vswitchs_ids, 0)}"
+  vswitch_id                 = "${element(var.public_vswitchs_ids, count.index)}"
   internet_max_bandwidth_out = 0 // Not allocate public IP for VPC instance
 
   security_groups            = ["${alicloud_security_group.web.id}", "${alicloud_security_group.ssh.id}"]
