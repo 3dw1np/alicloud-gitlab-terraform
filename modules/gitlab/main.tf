@@ -62,7 +62,7 @@ resource "alicloud_instance" "bastion" {
   instance_type              = "ecs.n4.large"
   system_disk_category       = "cloud_ssd"
   system_disk_size           = 50
-  image_id                   = "ubuntu_16_0402_64_20G_alibase_20171227.vhd"
+  image_id                   = "ubuntu_14_0405_64_20G_alibase_20170824.vhd"
 
   vswitch_id                 = "${element(var.public_vswitchs_ids, 0)}"
   internet_max_bandwidth_out = 1 // Not allocate public IP for VPC instance
@@ -76,14 +76,14 @@ resource "alicloud_instance" "web" {
   instance_type              = "ecs.n4.large"
   system_disk_category       = "cloud_ssd"
   system_disk_size           = 50
-  image_id                   = "ubuntu_16_0402_64_20G_alibase_20171227.vhd"
+  image_id                   = "ubuntu_14_0405_64_20G_alibase_20170824.vhd"
   count                      = 2
 
   vswitch_id                 = "${element(var.public_vswitchs_ids, count.index)}"
   internet_max_bandwidth_out = 0 // Not allocate public IP for VPC instance
 
   security_groups            = ["${alicloud_security_group.web.id}", "${alicloud_security_group.ssh.id}"]
-  user_data                  = "${data.template_file.user_data.rendered}"
+  user_data                  = "${element(data.template_file.user_data.*.rendered, count.index)}"
   password                   = "${var.ssh_password}"
 
   depends_on                 = ["alicloud_db_instance.default", "alicloud_db_account.account"]
