@@ -1,7 +1,9 @@
+Github repo: [https://github.com/3dw1np/alicloud-gitlab-terraform](https://github.com/3dw1np/alicloud-gitlab-terraform)
+
 # Deploy Gitlab HA on Alibaba Cloud with Terraform
 
 At Alibaba Cloud, we use Terraform to provide fast demos to our customers.
-I truly believe that the infrasture-as-code is the quick way to leverage a public cloud provider services. Instead of clicking on the Web Console UI, the logic of the infrasture-as-code allows us to define more accuratly each used services, automate the entire infrastructure and version it with a versionning control (git).
+I truly believe that the infrastructure-as-code is the quick way to leverage a public cloud provider services. Instead of clicking on the Web Console UI, the logic of the infrastructure-as-code allows us to define more accurately each used services, automate the entire infrastructure and version it with a versioning control (git).
 
 ## High-level design
 ![HLD](https://raw.githubusercontent.com/3dw1np/alicloud-gitlab-terraform/master/HLD.png)
@@ -48,6 +50,8 @@ terraform init
 
 ## Deployment steps
 ### Base vpc
+Please before run the second module, set configuration in parameters/base_vpc.tfvars 
+
 ```bash
 terraform init solutions/base_vpc
 terraform plan|apply \
@@ -57,24 +61,28 @@ terraform plan|apply \
 ```
 
 ### Managed services (manual setup)
-The managed services must be in the same region / VPC.
+The managed services must be in the same region / VPC (Singapore Region (ap-southeast-1) is used in this example).
 
 #### ApsaraDB for Redis
 
 * Create a new instance (Standard or Cluster mode) named **'gitlab&#95;ha&#95;redis'**
-* Select a private Vswitch where to bootstrap the instance
+* Select a private Vswitch where to bootstrap the instance (ex: **shared&#95;services&#95;private&#95;0**)
 * Keep in mind the password set
 * Replace the default whitelist group ips with **192.168.0.0/24,192.168.1.0/24** (corresponding to the public Vswitchs CIDR)
 * Then you can get the Connection Address (host) on the instance information page (ex:  r-gs5fa531c02cbc74.redis.singapore.rds.aliyuncs.com)
 
 #### NAS
 
-* Create a new file system
+* Buy Storage Package
+* Create a new file system of storage type NFS
 * Rename the NAS into **'gitlab&#95;ha&#95;nas'** 
-* Add one mount point to each public Vswitch (ex: 7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com and 7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com)
-* Use the default permission group (allow all)
+* Add one mount point to each public Vswitch (ex: 7**c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com** and **7c9b6481b5-uwy77.ap-southeast-1.nas.aliyuncs.com**)
+* Use the default permission group (**allow all**)
 
 ### Gitlab HA application
+
+Please before run the second module, set configuration in parameters/gitlab_ha.tfvars 
+
 ```bash
 terraform init solutions/gitlab_ha
 terraform plan|apply \
@@ -83,5 +91,10 @@ terraform plan|apply \
   solutions/gitlab_ha
 ```
 
+### Extra configuration for additional GitLab application servers
+You may connect on the second server to setup shared secrets: 
+[https://docs.gitlab.com/ee/administration/high_availability/gitlab.html#extra-configuration-for-additional-gitlab-application-servers]()
+
 ## Issues
-If you have any issues related to gitlab-ctl reconfigure (step: gitlab::database_migrations), please create the db manually by following the [help doc of RDS](https://www.alibabacloud.com/help/doc-detail/26156.htm).
+To debug you need to connect on the bastion host and then to one of the gitlab instance. You can check the logfile /var/log/bootstrap.log
+If you have any issues related to gitlab-ctl reconfigure and the database, please create the db manually by following the [help doc of RDS](https://www.alibabacloud.com/help/doc-detail/26156.htm).
