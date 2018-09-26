@@ -68,7 +68,6 @@ resource "alicloud_instance" "bastion" {
   internet_max_bandwidth_out = 1 // Not allocate public IP for VPC instance
 
   security_groups            = ["${alicloud_security_group.ssh.id}"]
-  //TODO: remove this
   password                   = "${var.ssh_password}"
 }
 
@@ -85,8 +84,9 @@ resource "alicloud_instance" "web" {
 
   security_groups            = ["${alicloud_security_group.web.id}", "${alicloud_security_group.ssh.id}"]
   user_data                  = "${data.template_file.user_data.rendered}"
-  //TODO: remove this
   password                   = "${var.ssh_password}"
+
+  depends_on                 = ["alicloud_db_instance.default", "alicloud_db_account.account"]
 }
 
 resource "alicloud_db_instance" "default" {
@@ -110,6 +110,7 @@ data "template_file" "user_data" {
   template = "${file("${path.module}/tpl/user_data.sh")}"
 
   vars {
+    INSTANCE_INDEX  = "${count.index}"
     WEB_URL         = "http://${alicloud_slb.web.address}"
     DB_CONNECT      = "${alicloud_db_instance.default.connection_string}"
     DB_PASSWORD     = "${var.db_password}"

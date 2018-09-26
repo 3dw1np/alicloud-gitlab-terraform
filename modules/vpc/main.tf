@@ -12,7 +12,7 @@ resource "alicloud_nat_gateway" "nat_gateway" {
   vpc_id          = "${alicloud_vpc.default.id}"
   specification   = "Small"
 
-  depends_on = ["alicloud_vswitch.public"]
+  depends_on      = ["alicloud_vswitch.public", "alicloud_vswitch.private"]
 }
 
 resource "alicloud_eip" "default" {
@@ -31,6 +31,8 @@ resource "alicloud_snat_entry" "default" {
   source_vswitch_id = "${element(alicloud_vswitch.public.*.id, count.index)}"
   snat_ip           = "${element(alicloud_eip.default.*.ip_address, count.index)}"
   count             = "${var.az_count}"
+
+  depends_on        = ["alicloud_eip_association.default"]
 }
 
 resource "alicloud_vswitch" "public" {
